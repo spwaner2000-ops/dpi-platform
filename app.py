@@ -10,10 +10,10 @@ st.set_page_config(page_title="Center for Collaborative Learning - A Lilmod Init
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 # Header Section
-st.title("🌱 Weekly Partnership Check-In")
+st.title("🌱 Center for Collaborative Development - A Lilmod Initiative")
 st.markdown("""
 Welcome! We believe early childhood development is a true partnership between school and home. 
-This quick check-in helps us understand how we are working together to support your child's growth this week.
+This quick check-in helps us understand how we are working together to support your child's growth.
 """)
 st.divider()
 

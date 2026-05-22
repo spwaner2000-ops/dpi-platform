@@ -4,7 +4,7 @@ from datetime import date
 from streamlit_gsheets import GSheetsConnection
 
 # Set page configuration
-st.set_page_config(page_title="Parent Partnership Check-In", page_icon="🌱", layout="centered")
+st.set_page_config(page_title="Center for Collaborative Learning - A Lilmod Initiative", page_icon="🌱", layout="centered")
 
 # Establish connection to Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)

@@ -33,7 +33,7 @@ with st.form("partnership_form"):
     reading_days = st.slider("How many days did you read a story together this week?", 0, 7, 0)
     play_days = st.slider("How many days did you engage in unplugged play?", 0, 7, 0)
     
-    st.subheader("3. Connecting with School")
+    st.subheader("3. Collaborating with School")
     updates = st.radio("Were you able to review this week's school communication?",
         ["Yes, read it thoroughly", "Skimmed the highlights", "Haven't had a chance yet"])
     events = st.radio("Did you participate in any school activities this week?",

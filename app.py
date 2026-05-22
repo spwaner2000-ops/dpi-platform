@@ -1,20 +1,13 @@
 import streamlit as st
 import pandas as pd
-import os
 from datetime import date
+from streamlit_gsheets import GSheetsConnection
 
-# Set page configuration and styling
+# Set page configuration
 st.set_page_config(page_title="Parent Partnership Check-In", page_icon="🌱", layout="centered")
 
-# Initialize the CSV file if it doesn't exist
-DATA_FILE = "engagement_data.csv"
-if not os.path.exists(DATA_FILE):
-    df_empty = pd.DataFrame(columns=[
-        "Date", "Child Name", "Class", "Reading Days", 
-        "Unplugged Play Days", "Reviewed Updates", 
-        "Event Participation", "Parent Insight"
-    ])
-    df_empty.to_csv(DATA_FILE, index=False)
+# Establish connection to Google Sheets
+conn = st.connection("gsheets", type=GSheetsConnection)
 
 # Header Section
 st.title("🌱 Weekly Partnership Check-In")
@@ -24,7 +17,6 @@ This quick check-in helps us understand how we are working together to support y
 """)
 st.divider()
 
-# The Form
 with st.form("partnership_form"):
     
     st.subheader("1. The Basics")
@@ -35,34 +27,17 @@ with st.form("partnership_form"):
         class_group = st.selectbox("Class / Group", ["Playgroup", "Nursery", "LKG", "UKG"])
         
     st.subheader("2. Learning & Play at Home")
-    st.markdown("*Even 15 minutes of dedicated interaction makes a profound impact.*")
-    
-    reading_days = st.slider(
-        "How many days did you read a story together this week?", 
-        min_value=0, max_value=7, value=0
-    )
-    
-    play_days = st.slider(
-        "How many days did you engage in unplugged play (e.g., building blocks, puzzles, drawing)?", 
-        min_value=0, max_value=7, value=0
-    )
+    reading_days = st.slider("How many days did you read a story together this week?", 0, 7, 0)
+    play_days = st.slider("How many days did you engage in unplugged play?", 0, 7, 0)
     
     st.subheader("3. Connecting with School")
-    updates = st.radio(
-        "Were you able to review this week's school communication?",
-        ["Yes, read it thoroughly", "Skimmed the highlights", "Haven't had a chance yet"]
-    )
-    
-    events = st.radio(
-        "Did you participate in any school activities this week?",
-        ["Attended an in-person event", "Supported asynchronously (e.g., sent requested materials from home)", "Not this week"]
-    )
+    updates = st.radio("Were you able to review this week's school communication?",
+        ["Yes, read it thoroughly", "Skimmed the highlights", "Haven't had a chance yet"])
+    events = st.radio("Did you participate in any school activities this week?",
+        ["Attended an in-person event", "Supported asynchronously", "Not this week"])
     
     st.subheader("4. Your Insights")
-    insight = st.text_area(
-        "Did you notice any new milestones or interests this week? (Optional)", 
-        placeholder="e.g., 'They showed a lot of interest in counting their toys...'"
-    )
+    insight = st.text_area("Did you notice any new milestones or interests this week? (Optional)")
     
     # Submit Button
     submitted = st.form_submit_button("Share Weekly Update")
@@ -71,7 +46,10 @@ with st.form("partnership_form"):
         if not child_name.strip():
             st.error("Please enter your child's name so we can update their portfolio.")
         else:
-            # Prepare data for saving
+            # 1. Pull the existing data from Google Sheets
+            existing_data = conn.read()
+            
+            # 2. Create the new row
             new_data = pd.DataFrame([{
                 "Date": date.today().strftime("%Y-%m-%d"),
                 "Child Name": child_name.strip(),
@@ -83,8 +61,9 @@ with st.form("partnership_form"):
                 "Parent Insight": insight
             }])
             
-            # Append to CSV
-            new_data.to_csv(DATA_FILE, mode='a', header=False, index=False)
+            # 3. Combine old data with new data and push it back to the Sheet
+            updated_df = pd.concat([existing_data, new_data], ignore_index=True)
+            conn.update(data=updated_df)
             
             st.success("Thank you for sharing! Your involvement at home is the foundation of their growth.")
-            st.balloons()
+st.balloons()

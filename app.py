@@ -31,7 +31,7 @@ with st.form("partnership_form"):
         
     st.subheader("2. Learning & Play at Home")
     reading_days = st.slider("How many days did you read a story together this week?", 0, 7, 0)
-    play_days = st.slider("How many days did you engage in unplugged play?", 0, 7, 0
+    play_days = st.slider("How many days did you engage in unplugged play?", 0, 7, 0)
     writing_days = st.slider("Were you able to assist or assess drawing, writing skills?", 0, 7, 0)
     reasoning_days = st.slider("Did you try to quiz the child randomly to check knowledge level?", 0, 7, 0)
     

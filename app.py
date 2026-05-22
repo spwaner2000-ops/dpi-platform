@@ -4,14 +4,10 @@ import pandas as pd
 import pandas as pd
 import datetime
 import datetime
-# --- CONFIGURATION ---
-# --- CONFIGURATION ---
 st.set_page_config(page_title="DPI Platform", layout="wide")
 st.set_page_config(page_title="DPI Platform", layout="wide")
 
 
-# --- MOCK DATABASE ---
-# --- MOCK DATABASE ---
 if "dpi" not in st.session_state:
 if "dpi" not in st.session_state:
     st.session_state["dpi"] = pd.DataFrame({
@@ -36,12 +32,8 @@ st.title("Developmental Partnership Index (DPI)")
 st.title("Developmental Partnership Index (DPI)")
 
 
-# --- PART 1: DATA ENTRY ---
-# --- PART 1: DATA ENTRY ---
 st.subheader("1. Log New Home Observation")
 st.subheader("1. Log New Home Observation")
-
-
 name = st.text_input("Child Name")
 name = st.text_input("Child Name")
 r = st.slider("Routine Sync", 1, 10, 5)
@@ -98,12 +90,8 @@ st.divider()
 st.divider()
 
 
-# --- PART 2: ANALYTICS ---
-# --- PART 2: ANALYTICS ---
 st.subheader("2. Kindergarten Cohort Analytics")
 st.subheader("2. Kindergarten Cohort Analytics")
-
-
 df = st.session_state["dpi"]
 df = st.session_state["dpi"]
 

@@ -13,8 +13,8 @@ if "dpi" not in st.session_state: st.session_state["dpi"] = pd.DataFrame({"Date"
 
 st.sidebar.title("Navigation")
 st.sidebar.title("Navigation")
-view = st.sidebar.radio("Select View:", ["Parent Input", "Educator Dashboard"])
-view = st.sidebar.radio("Select View:", ["Parent Input", "Educator Dashboard"])
+view = st.sidebar.radio("Select View:", ["Parent Input", "Educator Dashboard"], key="view_radio")
+view = st.sidebar.radio("Select View:", ["Parent Input", "Educator Dashboard"], key="view_radio")
 
 if view == "Parent Input": st.title("Home Observation Log")
 if view == "Parent Input": st.title("Home Observation Log")

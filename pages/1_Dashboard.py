@@ -5,6 +5,28 @@ from streamlit_gsheets import GSheetsConnection
 
 st.set_page_config(page_title="Engagement Maturity Dashboard", page_icon="📊", layout="wide")
 
+# --- PASSWORD AUTHENTICATION ---
+# Check if the user is already authenticated in this session
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+# If not authenticated, show the login screen and STOP the app
+if not st.session_state.authenticated:
+    st.title("🔒 Staff Login")
+    st.markdown("Please enter the staff password to access the internal dashboard.")
+    
+    pwd = st.text_input("Password", type="password")
+    if st.button("Login"):
+        # Check against the password saved in Streamlit Secrets
+        if pwd == st.secrets["staff_password"]:
+            st.session_state.authenticated = True
+            st.rerun()  # Refresh the page to load the dashboard
+        else:
+            st.error("Incorrect password. Please try again.")
+            
+    st.stop()  # This prevents the rest of the code from running until logged in
+
+# --- DASHBOARD CONTENT (Only runs if authenticated) ---
 st.title("📊 Engagement Maturity Dashboard")
 st.markdown("This view categorizes parent involvement to help staff identify which families are highly partnered and which might need targeted outreach.")
 st.divider()
@@ -15,7 +37,6 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 # Read the data
 try:
     df = conn.read()
-    # Drop empty rows that Google Sheets sometimes pulls in
     df = df.dropna(how="all") 
 except Exception as e:
     st.error("Could not read data from Google Sheets. Ensure your app.py is submitting data correctly.")
@@ -28,34 +49,28 @@ if df.empty:
 # --- CLASSIFICATION LOGIC ---
 def calculate_tier(row):
     score = 0
-    
-    # 1. Home Learning (Max 14 points)
     try:
         score += float(row.get("Reading Days", 0))
         score += float(row.get("Unplugged Play Days", 0))
     except:
         pass
         
-    # 2. Communication (Max 4 points)
     updates = str(row.get("Reviewed Updates", ""))
     if "read it thoroughly" in updates:
         score += 4
     elif "Skimmed" in updates:
         score += 2
         
-    # 3. Events (Max 4 points)
     events = str(row.get("Event Participation", ""))
     if "in-person" in events:
         score += 4
     elif "asynchronously" in events:
         score += 2
         
-    # 4. Insights Bonus (Max 2 points)
     insight = str(row.get("Parent Insight", ""))
     if insight.strip() and insight.lower() != 'nan':
         score += 2
         
-    # Map score (Max 24) to Tiers
     if score >= 18:
         return "4 - Partner"
     elif score >= 12:
@@ -65,23 +80,17 @@ def calculate_tier(row):
     else:
         return "1 - Informed"
 
-# Apply the logic to create a new column
 df["Maturity Tier"] = df.apply(calculate_tier, axis=1)
 
 # --- DASHBOARD VISUALS ---
-
 col1, col2 = st.columns([1, 2])
 
 with col1:
     st.subheader("Current Distribution")
-    
-    # Count how many families are in each tier
     tier_counts = df["Maturity Tier"].value_counts().reset_index()
     tier_counts.columns = ["Tier", "Count"]
-    # Sort so they appear in order
     tier_counts = tier_counts.sort_values("Tier")
     
-    # Donut Chart for overall tiers
     donut = alt.Chart(tier_counts).mark_arc(innerRadius=60).encode(
         theta=alt.Theta(field="Count", type="quantitative"),
         color=alt.Color(field="Tier", type="nominal", 
@@ -94,8 +103,6 @@ with col1:
 
 with col2:
     st.subheader("Maturity by Class")
-    
-    # Bar chart breaking down tiers by class
     class_tier = df.groupby(["Class", "Maturity Tier"]).size().reset_index(name="Count")
     
     bar_chart = alt.Chart(class_tier).mark_bar().encode(
@@ -115,12 +122,9 @@ st.divider()
 st.subheader("Targeted Outreach Roster")
 st.markdown("Use this table to see exactly where families sit. **Tip:** Focus outreach on families in the 'Informed' tier to gently encourage more involvement.")
 
-# Filter and display the data neatly
 display_cols = ["Date", "Child Name", "Parent Name", "Class", "Maturity Tier"]
-# Only show columns that actually exist in the dataframe to prevent errors
 existing_cols = [col for col in display_cols if col in df.columns]
 
-# Add a filter for staff to sort by class
 selected_class = st.selectbox("Filter by Class", ["All Classes"] + list(df["Class"].dropna().unique()))
 
 if selected_class != "All Classes":

@@ -1,37 +1,60 @@
-Python 3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)] on win32
-Type "help", "copyright", "credits" or "license" for more information.
->>>
->>> Traceback (most recent call last):
-  File "C:\Users\rajen\AppData\Local\Python\pythoncore-3.14-64\Lib\_pyrepl\readline.py", line 395, in multiline_input
-    return reader.readline()
-           ~~~~~~~~~~~~~~~^^
-  File "C:\Users\rajen\AppData\Local\Python\pythoncore-3.14-64\Lib\_pyrepl\reader.py", line 759, in readline
-    self.handle1()
-    ~~~~~~~~~~~~^^
-  File "C:\Users\rajen\AppData\Local\Python\pythoncore-3.14-64\Lib\_pyrepl\reader.py", line 742, in handle1
-    self.do_cmd(cmd)
-    ~~~~~~~~~~~^^^^^
-  File "C:\Users\rajen\AppData\Local\Python\pythoncore-3.14-64\Lib\_pyrepl\reader.py", line 672, in do_cmd
-    self.refresh()
-    ~~~~~~~~~~~~^^
-  File "C:\Users\rajen\AppData\Local\Python\pythoncore-3.14-64\Lib\_pyrepl\reader.py", line 649, in refresh
-    self.screen = self.calc_screen()
-                  ~~~~~~~~~~~~~~~~^^
-  File "C:\Users\rajen\AppData\Local\Python\pythoncore-3.14-64\Lib\_pyrepl\completing_reader.py", line 261, in calc_screen
-    screen = super().calc_screen()
-  File "C:\Users\rajen\AppData\Local\Python\pythoncore-3.14-64\Lib\_pyrepl\reader.py", line 315, in calc_screen
-    colors = list(gen_colors(self.get_unicode()))
-  File "C:\Users\rajen\AppData\Local\Python\pythoncore-3.14-64\Lib\_pyrepl\utils.py", line 115, in gen_colors
-    for color in gen_colors_from_token_stream(gen, line_lengths):
-                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\rajen\AppData\Local\Python\pythoncore-3.14-64\Lib\_pyrepl\utils.py", line 175, in gen_colors_from_token_stream
-    for prev_token, token, next_token in token_window:
-                                         ^^^^^^^^^^^^
-  File "C:\Users\rajen\AppData\Local\Python\pythoncore-3.14-64\Lib\_pyrepl\utils.py", line 384, in prev_next_window
-    for x in iterator:
-             ^^^^^^^^
-  File "C:\Users\rajen\AppData\Local\Python\pythoncore-3.14-64\Lib\tokenize.py", line 588, in _generate_tokens_from_c_tokenizer
-    for info in it:
-                ^^
-UnicodeEncodeError: 'utf-8' codec can't encode characters in position 57-58: surrogates not allowed
->>>
+import streamlit as st
+import streamlit as st
+import pandas as pd
+import pandas as pd
+
+st.set_page_config(page_title="DPI Dashboard")
+st.set_page_config(page_title="DPI Dashboard")
+
+if "auth" not in st.session_state: st.session_state.auth = False
+if "auth" not in st.session_state: st.session_state.auth = False
+if "role" not in st.session_state: st.session_state.role = ""
+if "role" not in st.session_state: st.session_state.role = ""
+if "data" not in st.session_state: st.session_state.data = pd.DataFrame({"Student": ["Aarav", "Diya"], "Tier": ["Collaborative", "Engaged"]})
+if "data" not in st.session_state: st.session_state.data = pd.DataFrame({"Student": ["Aarav", "Diya"], "Tier": ["Collaborative", "Engaged"]})
+
+if not st.session_state.auth: st.title("DPI Login")
+if not st.session_state.auth: st.title("DPI Login")
+if not st.session_state.auth: st.write("teacher/admin123 OR parent/parent123")
+if not st.session_state.auth: st.write("teacher/admin123 OR parent/parent123")
+if not st.session_state.auth: form = st.form("login")
+if not st.session_state.auth: form = st.form("login")
+if not st.session_state.auth: u = form.text_input("User").strip().lower()
+if not st.session_state.auth: u = form.text_input("User").strip().lower()
+if not st.session_state.auth: p = form.text_input("Password", type="password")
+if not st.session_state.auth: p = form.text_input("Password", type="password")
+if not st.session_state.auth: s = form.form_submit_button("Login")
+if not st.session_state.auth: s = form.form_submit_button("Login")
+if not st.session_state.auth and s and u == "teacher": st.session_state.auth = True; st.session_state.role = "Educator"; st.rerun()
+if not st.session_state.auth and s and u == "teacher": st.session_state.auth = True; st.session_state.role = "Educator"; st.rerun()
+if not st.session_state.auth and s and u == "parent": st.session_state.auth = True; st.session_state.role = "Parent"; st.rerun()
+if not st.session_state.auth and s and u == "parent": st.session_state.auth = True; st.session_state.role = "Parent"; st.rerun()
+if not st.session_state.auth: st.stop()
+if not st.session_state.auth: st.stop()
+
+st.sidebar.write("Role: " + st.session_state.role)
+st.sidebar.write("Role: " + st.session_state.role)
+if st.sidebar.button("Logout"): st.session_state.auth = False; st.rerun()
+if st.sidebar.button("Logout"): st.session_state.auth = False; st.rerun()
+
+if st.session_state.role == "Educator": st.title("Analytics Dashboard")
+if st.session_state.role == "Educator": st.title("Analytics Dashboard")
+if st.session_state.role == "Educator": st.dataframe(st.session_state.data, use_container_width=True)
+if st.session_state.role == "Educator": st.dataframe(st.session_state.data, use_container_width=True)
+if st.session_state.role == "Educator": st.stop()
+if st.session_state.role == "Educator": st.stop()
+
+if st.session_state.role == "Parent": st.title("Log Observation")
+if st.session_state.role == "Parent": st.title("Log Observation")
+if st.session_state.role == "Parent": obs = st.form("obs")
+if st.session_state.role == "Parent": obs = st.form("obs")
+if st.session_state.role == "Parent": name = obs.text_input("Child Name")
+if st.session_state.role == "Parent": name = obs.text_input("Child Name")
+if st.session_state.role == "Parent": score = obs.slider("Routine Sync", 1, 10, 5)
+if st.session_state.role == "Parent": score = obs.slider("Routine Sync", 1, 10, 5)
+if st.session_state.role == "Parent": save = obs.form_submit_button("Save")
+if st.session_state.role == "Parent": save = obs.form_submit_button("Save")
+if st.session_state.role == "Parent" and save and name: st.success("Saved score " + str(score) + " for " + name)
+if st.session_state.role == "Parent" and save and name: st.success("Saved score " + str(score) + " for " + name)
+if st.session_state.role == "Parent": st.stop()
+if st.session_state.role == "Parent": st.stop()

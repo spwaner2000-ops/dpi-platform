@@ -20,10 +20,13 @@ st.divider()
 with st.form("partnership_form"):
     
     st.subheader("1. The Basics")
-    col1, col2 = st.columns(2)
+    # Updated to a 3-column layout to fit the new Parent Name field smoothly
+    col1, col2, col3 = st.columns(3)
     with col1:
-        child_name = st.text_input("Child's First Name")
+        parent_name = st.text_input("Your Name (Parent/Guardian)")
     with col2:
+        child_name = st.text_input("Child's First Name")
+    with col3:
         class_group = st.selectbox("Class / Group", ["Playgroup", "Nursery", "LKG", "UKG"])
         
     st.subheader("2. Learning & Play at Home")
@@ -43,15 +46,17 @@ with st.form("partnership_form"):
     submitted = st.form_submit_button("Share Weekly Update")
     
     if submitted:
-        if not child_name.strip():
-            st.error("Please enter your child's name so we can update their portfolio.")
+        # Added a check to ensure the Parent Name is filled out
+        if not parent_name.strip() or not child_name.strip():
+            st.error("Please enter both your name and your child's name so we can update their portfolio.")
         else:
             # 1. Pull the existing data from Google Sheets
             existing_data = conn.read()
             
-            # 2. Create the new row
+            # 2. Create the new row (Now includes "Parent Name")
             new_data = pd.DataFrame([{
                 "Date": date.today().strftime("%Y-%m-%d"),
+                "Parent Name": parent_name.strip(),
                 "Child Name": child_name.strip(),
                 "Class": class_group,
                 "Reading Days": reading_days,

@@ -52,6 +52,9 @@ def calculate_tier(row):
     try:
         score += float(row.get("Reading Days", 0))
         score += float(row.get("Unplugged Play Days", 0))
+        score += float(row.get("Writing Days", 0))
+        score += float(row.get("Reasoning Days", 0))
+      
     except:
         pass
         

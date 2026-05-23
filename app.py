@@ -47,15 +47,32 @@ with st.form("partnership_form"):
     # Submit Button
     submitted = st.form_submit_button("Share Weekly Update")
     
-    if submitted:
-        # Added a check to ensure the Parent Name is filled out
+   if submitted:
         if not parent_name.strip() or not child_name.strip():
             st.error("Please enter both your name and your child's name so we can update their portfolio.")
         else:
-            # 1. Pull the existing data from Google Sheets
-            existing_data = conn.read()
+            # Pull the existing data from Google Sheets
+            existing_data = conn.read(ttl=0)
             
-            # 2. Create the new row (Now includes "Parent Name")
+            # --- DUPLICATE CHECK LOGIC ---
+            if not existing_data.empty and "Date" in existing_data.columns and "Child Name" in existing_data.columns:
+                # Convert Date column to actual datetime objects
+                existing_data["Date"] = pd.to_datetime(existing_data["Date"], errors='coerce')
+                
+                # Get current month and year
+                current_month = date.today().month
+                current_year = date.today().year
+                
+                # Check if this child already has an entry this month
+                child_matches = existing_data[existing_data["Child Name"].str.strip().str.lower() == child_name.strip().lower()]
+                month_matches = child_matches[(child_matches["Date"].dt.month == current_month) & (child_matches["Date"].dt.year == current_year)]
+                
+                if not month_matches.empty:
+                    st.warning(f"Thank you! We already have a check-in for {child_name.strip().title()} this month. We look forward to your next update in {date.today().replace(month=(current_month%12)+1).strftime('%B')}!")
+                    st.stop() # This halts the script so no data is saved
+            # -----------------------------
+
+            # Create the new row
             new_data = pd.DataFrame([{
                 "Date": date.today().strftime("%Y-%m-%d"),
                 "Parent Name": parent_name.strip(),
@@ -68,7 +85,7 @@ with st.form("partnership_form"):
                 "Parent Insight": insight
             }])
             
-            # 3. Combine old data with new data and push it back to the Sheet
+            # Combine and push back to the Sheet
             updated_df = pd.concat([existing_data, new_data], ignore_index=True)
             conn.update(data=updated_df)
             

@@ -36,7 +36,7 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 
 # Read the data
 try:
-    df = conn.read()
+    df = conn.read(ttl=0)
     df = df.dropna(how="all") 
 except Exception as e:
     st.error("Could not read data from Google Sheets. Ensure your app.py is submitting data correctly.")
